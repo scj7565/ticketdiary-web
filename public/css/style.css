@@ -1,0 +1,145 @@
+/* 공통 스타일: 모든 페이지에서 불러온다. */
+
+/* ---------- 색상·크기 변수 ---------- */
+:root {
+  --color-bg: #fbfbf9;     /* 페이지 배경 */
+  --color-text: #111111;   /* 글자, 선 */
+  --color-muted: #595959;  /* 푸터 글자 */
+  --color-accent: #1238d6; /* 강조색: 현재 메뉴, 마우스를 올린 링크 */
+  --content-width: 1200px; /* 헤더, 본문, 푸터의 최대 너비 */
+  --gutter: 40px;          /* 화면 좌우 여백 */
+}
+
+/* ---------- 기본 설정 ---------- */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  /* 푸터를 화면 아래에 붙이기 위해 세로 flex로 배치한다 */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin: 0;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+  line-height: 1.6;
+  word-break: keep-all; /* 한글을 단어 단위로 줄바꿈한다 */
+}
+
+a {
+  color: inherit;
+}
+
+/* 키보드로 이동할 때 현재 위치를 보여 준다 */
+a:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+/* ---------- 헤더와 메뉴 ---------- */
+.site-header {
+  border-bottom: 2px solid var(--color-text);
+}
+
+.header-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline; /* 로고와 메뉴의 글자 아래쪽을 맞춘다 */
+  gap: 32px;
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: 20px var(--gutter);
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+}
+
+.menu {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 28px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.menu a {
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.menu a:hover {
+  color: var(--color-accent);
+}
+
+/* 현재 보고 있는 페이지의 메뉴 */
+.menu a.active {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 8px;
+}
+
+/* ---------- 본문 ---------- */
+.content {
+  flex: 1; /* 내용이 적어도 본문이 남은 높이를 채워 푸터를 아래로 민다 */
+  width: 100%;
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: 56px var(--gutter);
+}
+
+.page-title {
+  margin: 0;
+  font-size: 2.75rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+}
+
+/* ---------- 푸터 ---------- */
+.site-footer {
+  border-top: 1px solid var(--color-text);
+  color: var(--color-muted);
+  font-size: 0.875rem;
+}
+
+.site-footer p {
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: 16px var(--gutter);
+}
+
+/* ---------- 반응형: 화면이 좁을 때 ---------- */
+@media (max-width: 720px) {
+  :root {
+    --gutter: 16px;
+  }
+
+  /* 로고 아래로 메뉴를 내린다 */
+  .header-inner {
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+
+  .menu {
+    gap: 12px;
+  }
+
+  .content {
+    padding-top: 32px;
+    padding-bottom: 32px;
+  }
+
+  .page-title {
+    font-size: 2rem;
+  }
+}
