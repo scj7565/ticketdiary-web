@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>공연 찾기 | Ticket Diary</title>
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/explore.css">
 </head>
 <body>
   <header class="site-header">
@@ -15,7 +16,6 @@
           <li><a href="index.html">홈</a></li>
           <li><a class="active" href="explore.html">공연 찾기</a></li>
           <li><a href="diary.html">내 다이어리</a></li>
-          <li><a href="add.html">티켓 추가</a></li>
           <li><a href="summary.html">결산</a></li>
         </ul>
       </nav>
@@ -24,10 +24,61 @@
 
   <main class="content">
     <h1 class="page-title">공연 찾기</h1>
+
+    <form class="filter" id="filter">
+      <label>
+        <span>검색</span>
+        <input type="search" id="keyword" placeholder="공연명 또는 공연장">
+      </label>
+    </form>
+
+    <p class="result-count" id="count"></p>
+    <ul class="poster-grid" id="grid"></ul>
+    <ul class="concert-list" id="list" hidden></ul>
+    <button type="button" class="more-button" id="more" hidden>더 보기</button>
+
+    <!-- 티켓 추가 창: 공연 목록에서 "티켓 추가"를 누르면 열린다 -->
+    <dialog class="ticket-dialog" id="ticket-dialog">
+      <h2 class="dialog-title">티켓 추가</h2>
+
+      <div class="selected">
+        <div class="poster" id="dialog-poster"></div>
+        <div class="info">
+          <h2 id="dialog-name"></h2>
+          <p class="detail" id="dialog-detail"></p>
+        </div>
+      </div>
+
+      <form class="ticket-form" id="ticket-form">
+        <div class="field">
+          <label for="ticket-date">관람일</label>
+          <select id="ticket-date"></select>
+        </div>
+
+        <div class="field">
+          <div class="label-row">
+            <label for="ticket-grade">좌석</label>
+            <span class="price" id="ticket-price"></span>
+          </div>
+          <div class="seat-row">
+            <select id="ticket-grade"></select>
+            <input type="text" id="ticket-seat" aria-label="좌석 상세" placeholder="예: 1층 B구역 12열 8번">
+          </div>
+        </div>
+      </form>
+
+      <div class="dialog-buttons">
+        <button type="button" id="dialog-close">닫기</button>
+        <button type="button" class="primary" id="dialog-add">추가</button>
+      </div>
+    </dialog>
   </main>
 
   <footer class="site-footer">
     <p>공연 데이터 출처: KOPIS 공연예술통합전산망</p>
   </footer>
+
+  <script src="js/common.js"></script>
+  <script src="js/explore.js"></script>
 </body>
 </html>
