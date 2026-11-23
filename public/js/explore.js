@@ -1,243 +1,237 @@
-// 공연 찾기: 공연 목록을 불러와 보여 주고, 검색어로 거른다.
+// 공연 찾기: 공연 목록을 불러와 표시하고 검색어로 필터링
 
-const keywordInput = document.getElementById("keyword");
-const countText = document.getElementById("count");
-const gridEl = document.getElementById("grid");
-const listEl = document.getElementById("list");
-const moreButton = document.getElementById("more");
+const keywordInput = document.querySelector("#keyword");
+const countText = document.querySelector("#count");
+const gridEl = document.querySelector("#grid");
+const listEl = document.querySelector("#list");
+const moreButton = document.querySelector("#more");
 
-const GRID_SIZE = 10; // 검색 전에 보여 주는 포스터 수
-const PAGE_SIZE = 20; // 검색 결과를 한 번에 보여 주는 공연 수
+const GRID_SIZE = 10; // 검색 전 표시하는 포스터 수
+const PAGE_SIZE = 20; // 검색 결과를 한 번에 표시하는 공연 수
 
 let concerts = []; // 불러온 전체 공연
 let matches = []; // 검색어에 맞는 공연
-let shown = 0; // 지금까지 화면에 그린 공연 수
+let shown = 0; // 지금까지 화면에 출력한 공연 수
 
-// 포스터 칸을 만든다. 포스터가 없으면 "포스터 없음"을 적는다.
+// 포스터 칸 생성, 포스터가 없으면 "포스터 없음" 표시
 function createPoster(concert) {
   const poster = document.createElement("div");
-  poster.className = "poster";
+  poster.classList.add("poster");
   if (concert.poster) {
     const img = document.createElement("img");
     img.src = concert.poster;
     img.alt = concert.prfnm + " 포스터";
-    img.loading = "lazy"; // 화면에 가까워졌을 때 불러온다
+    img.loading = "lazy"; // 화면에 가까워졌을 때 불러오기
     poster.appendChild(img);
   } else {
-    poster.textContent = "포스터 없음";
+    poster.innerText = "포스터 없음";
   }
   return poster;
 }
 
-// 검색 전에 보여 주는 포스터 한 장(포스터와 아래의 작은 글자)을 만든다. 누르면 티켓 추가 창이 열린다.
+// 검색 전 포스터 한 장(포스터와 아래의 작은 글자) 생성, 누르면 티켓 추가 창 열림
 function createCard(concert) {
   const li = document.createElement("li");
 
   const button = document.createElement("button");
   button.type = "button";
-  button.className = "poster-card";
-  button.addEventListener("click", () => openDialog(concert));
+  button.classList.add("poster-card");
+  button.addEventListener("click", function () {
+    openModal(concert);
+  });
 
   const title = document.createElement("span");
-  title.className = "card-title";
-  title.textContent = concert.prfnm;
+  title.classList.add("card-title");
+  title.innerText = concert.prfnm;
 
   const date = document.createElement("span");
-  date.className = "card-date";
-  date.textContent = concert.prfpdfrom + " ~ " + concert.prfpdto;
+  date.classList.add("card-date");
+  date.innerText = concert.prfpdfrom + " ~ " + concert.prfpdto;
 
-  button.append(createPoster(concert), title, date);
+  button.appendChild(createPoster(concert));
+  button.appendChild(title);
+  button.appendChild(date);
   li.appendChild(button);
   return li;
 }
 
-// 공연 한 건을 목록 항목으로 만든다.
+// 공연 한 건을 목록 항목으로 생성
 function createItem(concert) {
   const li = document.createElement("li");
-  li.className = "concert";
-
-  const poster = createPoster(concert);
+  li.classList.add("concert");
 
   const info = document.createElement("div");
-  info.className = "info";
+  info.classList.add("info");
 
   const title = document.createElement("h2");
-  title.textContent = concert.prfnm;
+  title.innerText = concert.prfnm;
 
   const detail = document.createElement("p");
-  detail.className = "detail";
-  detail.textContent =
-    concert.prfpdfrom + " ~ " + concert.prfpdto + " · " + concert.fcltynm;
+  detail.classList.add("detail");
+  detail.innerText = concert.prfpdfrom + " ~ " + concert.prfpdto + ", " + concert.fcltynm;
 
-  info.append(title, detail);
+  info.appendChild(title);
+  info.appendChild(detail);
 
   const add = document.createElement("button");
   add.type = "button";
-  add.className = "add-button";
-  add.textContent = "티켓 추가";
-  add.addEventListener("click", () => openDialog(concert));
+  add.classList.add("button", "add-button");
+  add.innerText = "티켓 추가";
+  add.addEventListener("click", function () {
+    openModal(concert);
+  });
 
-  li.append(poster, info, add);
+  li.appendChild(createPoster(concert));
+  li.appendChild(info);
+  li.appendChild(add);
   return li;
 }
 
-// 검색어에 맞는 공연 중 PAGE_SIZE건씩만 화면에 그린다. 많은 공연을 한꺼번에 그리면 느려지기 때문이다.
+// 검색어에 맞는 공연 중 PAGE_SIZE건씩만 화면에 출력, 많은 공연을 한꺼번에 출력하면 느려지기 때문
 function renderMore() {
   const next = matches.slice(shown, shown + PAGE_SIZE);
-  listEl.append(...next.map(createItem));
+  next.forEach(function (concert) {
+    listEl.appendChild(createItem(concert));
+  });
   shown += next.length;
 
-  countText.textContent =
-    matches.length === 0
-      ? "조건에 맞는 공연이 없습니다."
-      : "공연 " + matches.length + "건 중 " + shown + "건 표시";
-  moreButton.hidden = shown >= matches.length;
+  if (matches.length === 0) {
+    countText.innerText = "조건에 맞는 공연이 없습니다.";
+  } else {
+    countText.innerText = "공연 " + matches.length + "건 중 " + shown + "건 표시";
+  }
+
+  if (shown >= matches.length) {
+    moreButton.classList.add("hidden");
+  } else {
+    moreButton.classList.remove("hidden");
+  }
 }
 
-// 공연을 무작위로 섞어 GRID_SIZE건을 골라 포스터 칸에 그린다. 페이지를 열 때 한 번만 한다.
+// 공연을 무작위로 섞어 GRID_SIZE건을 선택해 포스터 칸에 출력, 페이지를 열 때 한 번만 실행
 function renderGrid() {
-  const picks = [...concerts].sort(() => Math.random() - 0.5).slice(0, GRID_SIZE);
-  gridEl.append(...picks.map(createCard));
+  const picks = concerts.slice().sort(function () {
+    return Math.random() - 0.5;
+  });
+  picks.slice(0, GRID_SIZE).forEach(function (concert) {
+    gridEl.appendChild(createCard(concert));
+  });
 }
 
-// 검색어가 없으면 포스터 모음을, 있으면 검색 결과 목록을 보여 준다.
+// 검색어가 없으면 포스터 모음, 있으면 검색 결과 목록 표시
 function render() {
   const keyword = keywordInput.value.trim().toLowerCase();
 
-  const searching = keyword !== "";
-  gridEl.hidden = searching;
-  listEl.hidden = !searching;
-  if (!searching) {
-    countText.textContent = "포스터를 누르면 티켓을 추가할 수 있습니다.";
-    moreButton.hidden = true;
+  if (keyword === "") {
+    gridEl.classList.remove("hidden");
+    listEl.classList.add("hidden");
+    moreButton.classList.add("hidden");
+    countText.innerText = "포스터를 누르면 티켓을 추가할 수 있습니다.";
     return;
   }
 
-  matches = concerts.filter(
-    (c) =>
-      c.prfnm.toLowerCase().includes(keyword) ||
-      c.fcltynm.toLowerCase().includes(keyword)
-  );
+  gridEl.classList.add("hidden");
+  listEl.classList.remove("hidden");
 
-  listEl.replaceChildren();
+  matches = concerts.filter(function (c) {
+    return c.prfnm.toLowerCase().includes(keyword) || c.fcltynm.toLowerCase().includes(keyword);
+  });
+
+  listEl.innerHTML = "";
   shown = 0;
   renderMore();
 }
 
 // ---------- 티켓 추가 창 ----------
 
-const dialogEl = document.getElementById("ticket-dialog");
-const dateSelect = document.getElementById("ticket-date");
-const gradeSelect = document.getElementById("ticket-grade");
-const seatInput = document.getElementById("ticket-seat");
-const priceText = document.getElementById("ticket-price");
+const modalBox = document.querySelector("#modal-box");
+const dateSelect = document.querySelector("#ticket-date");
+const gradeSelect = document.querySelector("#ticket-grade");
+const seatInput = document.querySelector("#ticket-seat");
+const priceText = document.querySelector("#ticket-price");
 
-// "2026.11.20" 형식의 글을 Date로 바꾼다.
-function parseDate(text) {
-  const [year, month, day] = text.split(".").map(Number);
-  return new Date(year, month - 1, day);
-}
+let selectedConcert = null; // 창에서 티켓을 추가할 공연
+let grades = []; // 선택한 공연의 좌석 등급과 가격
 
-// 공연 기간의 날짜를 하루씩 관람일 선택 목록으로 만든다.
-function fillDates(concert) {
-  const first = document.createElement("option");
-  first.value = "";
-  first.textContent = "관람일";
-  dateSelect.replaceChildren(first);
+// 선택한 공연의 정보를 채우고 창 열기
+function openModal(concert) {
+  selectedConcert = concert;
 
-  const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
-  const last = parseDate(concert.prfpdto);
-  for (let day = parseDate(concert.prfpdfrom); day <= last; day.setDate(day.getDate() + 1)) {
-    const yyyy = day.getFullYear();
-    const mm = String(day.getMonth() + 1).padStart(2, "0");
-    const dd = String(day.getDate()).padStart(2, "0");
-
-    const option = document.createElement("option");
-    option.value = yyyy + "-" + mm + "-" + dd;
-    option.textContent = yyyy + "." + mm + "." + dd + " (" + weekdays[day.getDay()] + ")";
-    dateSelect.appendChild(option);
-  }
-}
-
-// "R석 150,000원, S석 110,000원" 같은 가격 안내 글을 [{ name, price }] 목록으로 바꾼다.
-function parsePrices(guidance) {
-  const result = [];
-  // 등급 이름("1일권"처럼 숫자가 들어가도 됨), 공백, 가격, "원" 순서로 찾는다.
-  const pattern = /([^,]+?)\s+([\d,]+)원/g;
-  let match;
-  while ((match = pattern.exec(guidance)) !== null) {
-    result.push({ name: match[1].trim(), price: match[2] });
-  }
-  return result;
-}
-
-// 공연의 가격 안내에서 좌석 등급 선택 목록을 만든다.
-function fillGrades(concert) {
-  const grades = parsePrices(concert.pcseguidance || "");
-
-  const first = document.createElement("option");
-  first.value = "";
-  first.textContent = "좌석 등급";
-  gradeSelect.replaceChildren(first);
-
-  for (const grade of grades) {
-    const option = document.createElement("option");
-    option.value = grade.name;
-    option.dataset.price = grade.price;
-    option.textContent = grade.name;
-    gradeSelect.appendChild(option);
-  }
-
-  priceText.textContent = grades.length === 0 ? "가격 안내가 없는 공연입니다." : "";
-}
-
-// 고른 좌석 등급의 가격을 보여 준다.
-function showPrice() {
-  const option = gradeSelect.selectedOptions[0];
-  priceText.textContent = option && option.dataset.price ? "가격 " + option.dataset.price + "원" : "";
-}
-
-// 선택한 공연의 정보를 채우고 창을 연다.
-function openDialog(concert) {
-  const poster = document.getElementById("dialog-poster");
+  const poster = document.querySelector("#modal-poster");
+  poster.innerHTML = "";
   if (concert.poster) {
     const img = document.createElement("img");
     img.src = concert.poster;
     img.alt = concert.prfnm + " 포스터";
-    poster.replaceChildren(img);
+    poster.appendChild(img);
   } else {
-    poster.textContent = "포스터 없음";
+    poster.innerText = "포스터 없음";
   }
 
-  document.getElementById("dialog-name").textContent = concert.prfnm;
-  document.getElementById("dialog-detail").textContent =
-    concert.prfpdfrom + " ~ " + concert.prfpdto + " · " + concert.fcltynm;
+  document.querySelector("#modal-name").innerText = concert.prfnm;
+  document.querySelector("#modal-detail").innerText =
+    concert.prfpdfrom + " ~ " + concert.prfpdto + ", " + concert.fcltynm;
 
-  fillDates(concert);
-  fillGrades(concert);
+  fillDateOptions(dateSelect, concert, "");
+  grades = fillGradeOptions(gradeSelect, priceText, concert, "");
   seatInput.value = "";
 
-  dialogEl.showModal();
+  modalBox.classList.add("active");
 }
 
-gradeSelect.addEventListener("change", showPrice);
-document.getElementById("dialog-close").addEventListener("click", () => dialogEl.close());
-
-async function init() {
-  try {
-    concerts = await loadConcerts();
-  } catch (error) {
-    countText.textContent =
-      "공연 목록을 불러오지 못했습니다. Live Server로 열었는지 확인해 주세요.";
+// 입력한 내용으로 티켓을 저장하고 내 다이어리로 이동
+function addTicket() {
+  if (dateSelect.value === "") {
+    alert("관람일을 선택해 주세요.");
     return;
   }
-  renderGrid();
-  render();
+
+  const tickets = loadTickets();
+  // 같은 공연, 같은 날짜의 티켓이 이미 있으면 안내 (추가는 막지 않음)
+  const same = tickets.filter(function (t) {
+    return t.concert.mt20id === selectedConcert.mt20id && t.date === dateSelect.value;
+  });
+  if (same.length > 0 && !confirm("같은 공연, 같은 날짜의 티켓이 이미 있습니다. 그래도 추가할까요?")) {
+    return;
+  }
+
+  tickets.push({
+    id: String(new Date().getTime()),
+    concert: selectedConcert,
+    date: dateSelect.value,
+    grade: gradeSelect.value,
+    price: getSelectedPrice(gradeSelect, grades),
+    seat: seatInput.value.trim(),
+  });
+  saveTickets(tickets);
+
+  // 방금 추가한 티켓이 보이도록 다이어리의 탭을 "전체"로 초기화
+  sessionStorage.setItem("diaryTab", "tab-all");
+  location.href = "diary.html";
+}
+
+gradeSelect.addEventListener("change", function () {
+  showPrice(gradeSelect, priceText, grades);
+});
+document.querySelector("#modal-close").addEventListener("click", function () {
+  modalBox.classList.remove("active");
+});
+document.querySelector("#modal-add").addEventListener("click", addTicket);
+
+// 공연 목록을 불러와 화면 출력
+function init() {
+  loadConcerts()
+    .then(function (data) {
+      concerts = data;
+      renderGrid();
+      render();
+    })
+    .catch(function () {
+      countText.innerText = "공연 목록을 불러오지 못했습니다. Live Server로 열었는지 확인해 주세요.";
+    });
 }
 
 keywordInput.addEventListener("input", render);
 moreButton.addEventListener("click", renderMore);
-// 검색창에서 Enter를 눌러도 페이지가 새로고침되지 않게 한다.
-document.getElementById("filter").addEventListener("submit", (e) => e.preventDefault());
 
 init();

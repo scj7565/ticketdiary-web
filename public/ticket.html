@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>티켓 상세 | Ticket Diary</title>
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/ticket.css">
 </head>
 <body>
   <header class="site-header">
@@ -22,11 +23,97 @@
   </header>
 
   <main class="content">
-    <h1 class="page-title">티켓 상세</h1>
+    <p class="message hidden" id="message">
+      티켓을 찾을 수 없습니다. <a href="diary.html">내 다이어리로 돌아가기</a>
+    </p>
+
+    <article class="ticket hidden" id="ticket">
+      <div class="poster" id="ticket-poster"></div>
+      <div class="ticket-body">
+        <p class="status" id="status"></p>
+        <h2 id="ticket-name"></h2>
+        <dl>
+          <dt>관람일</dt>
+          <dd id="ticket-day"></dd>
+          <dt>공연장</dt>
+          <dd id="ticket-venue"></dd>
+          <dt>좌석</dt>
+          <dd id="ticket-seat-text"></dd>
+          <dt>가격</dt>
+          <dd id="ticket-price-text"></dd>
+        </dl>
+        <div class="actions">
+          <button type="button" class="button" id="edit-button">수정</button>
+          <button type="button" class="button" id="delete-button">삭제</button>
+        </div>
+      </div>
+
+      <!-- 오른쪽 칸: 공연 전에는 체크리스트, 공연 후에는 셋리스트 -->
+      <div class="side">
+        <section id="checklist-section">
+          <h2>체크리스트</h2>
+          <ul class="checklist" id="checklist"></ul>
+          <form class="add-form">
+            <input type="text" id="check-input" placeholder="준비물 (예: 신분증, 보조배터리)">
+            <button type="submit" class="button" id="check-add">추가</button>
+          </form>
+        </section>
+
+        <section id="setlist-section">
+          <h2>셋리스트</h2>
+          <ol class="checklist" id="setlist"></ol>
+          <form class="add-form">
+            <input type="text" id="song-input" placeholder="곡 제목">
+            <button type="submit" class="button" id="song-add">추가</button>
+          </form>
+        </section>
+      </div>
+
+      <!-- 아래 글 칸: 공연 전에는 메모, 공연 후에는 후기 -->
+      <section class="write">
+        <h2 id="write-title"></h2>
+        <textarea id="write-box" rows="4"></textarea>
+        <div class="save-row">
+          <button type="button" class="button" id="write-save">저장</button>
+          <span class="saved" id="write-saved"></span>
+        </div>
+      </section>
+    </article>
   </main>
+
+  <!-- 수정 창: 관람일과 좌석 수정, active 클래스가 붙으면 표시 -->
+  <div class="modal" id="modal-box">
+    <div class="modal-content">
+      <h2 class="modal-title">티켓 수정</h2>
+
+      <div class="field">
+        <label for="ticket-date">관람일</label>
+        <select id="ticket-date"></select>
+      </div>
+
+      <div class="field">
+        <div class="label-row">
+          <label for="ticket-grade">좌석</label>
+          <span class="price" id="ticket-price"></span>
+        </div>
+        <div class="seat-row">
+          <select id="ticket-grade"></select>
+          <input type="text" id="ticket-seat" placeholder="예: 1층 B구역 12열 8번">
+        </div>
+      </div>
+
+      <div class="modal-buttons">
+        <button type="button" id="modal-close">닫기</button>
+        <button type="button" class="primary" id="modal-save">저장</button>
+      </div>
+    </div>
+  </div>
 
   <footer class="site-footer">
     <p>공연 데이터 출처: KOPIS 공연예술통합전산망</p>
   </footer>
+
+  <script src="js/common.js"></script>
+  <script src="js/ticket.js"></script>
 </body>
 </html>

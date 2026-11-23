@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>내 다이어리 | Ticket Diary</title>
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/diary.css">
 </head>
 <body>
   <header class="site-header">
@@ -22,11 +23,23 @@
   </header>
 
   <main class="content">
-    <h1 class="page-title">내 다이어리</h1>
+    <div class="controls">
+      <div class="tabs">
+        <button type="button" id="tab-all">전체</button>
+        <button type="button" id="tab-upcoming">예정</button>
+        <button type="button" id="tab-done">관람 완료</button>
+      </div>
+    </div>
+
+    <p class="result-count" id="count"></p>
+    <ul class="ticket-list" id="list"></ul>
   </main>
 
   <footer class="site-footer">
     <p>공연 데이터 출처: KOPIS 공연예술통합전산망</p>
   </footer>
+
+  <script src="js/common.js"></script>
+  <script src="js/diary.js"></script>
 </body>
 </html>
